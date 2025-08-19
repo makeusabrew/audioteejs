@@ -44,14 +44,6 @@ interface AudioTeeOptions {
 }
 ```
 
-### Option details
-
-- **`sampleRate`**: Converts audio to the specified sample rate. Common values are `16000`, `44100`, `48000`.
-- **`chunkDuration`**: Controls how frequently data events are emitted. Smaller values = more frequent events with smaller chunks. Specified in seconds
-- **`mute`**: When `true`, system audio is muted whilst AudioTee is capturing
-- **`includeProcesses`**: Array of process IDs to capture audio from (all others filtered out)
-- **`excludeProcesses`**: Array of process IDs to **exclude** from capture
-
 ## Events
 
 AudioTee uses an EventEmitter interface to stream audio data and system events:
@@ -85,7 +77,7 @@ audiotee.on('log', (message: string, level: LogLevel) => {
 
 ### Event details
 
-Note: a bug in versions up to 0.0.2 means only the `data` lifecycle event is actually currently emitted.
+Note: a bug in versions up to and including 0.0.2 means only the `data` lifecycle event is actually currently emitted.
 
 - **`data`**: Emitted for each audio chunk. The `data` property contains raw PCM audio bytes
 - **`start`**: Emitted when audio capture begins successfully
@@ -105,8 +97,14 @@ During the `0.x.x` release, the API is unstable and subject to change without no
 
 - Always specify a sample rate. Tell AudioTee what you want, rather than having to parse the
   `metadata` message to see what you got from the output device
-- Specifying _any_ sample rate automatically switches encoding to use 16-bit signed integers, which is half the byte size compared to the 32-bit float the stream probably uses natively
+- Specifying _any_ sample rate automatically switches encoding to use 16-bit signed integers, which is half the byte size and bandwidth compared to the 32-bit float the stream probably uses natively
 - You'll probably need to specify a different `chunkDuration` depending on your use case. For example, some ASRs are quite particular about the exact length of each chunk they expect to process.
+
+## Permissions
+
+There is no provision in the underlying AudioTee library to pre-emptively check the state of the required `NSAudioCaptureUsageDescription` permission. You _should_ be prompted to grant it the first time AudioTee.js tries to record anything, but at least some popular terminal emulators like iTerm and those built in to VSCode/Cursor don't. They will instead happily start recording total silence.
+
+You can work around this either by using the built in macOS terminal emulator, or by granting system audio recording permission manually. Open Settings > Privacy & Security > Screen & System Audio Recording and scroll down to the **System Audio Recording Only** section (**not** the top 'Screen & System Audio Recording' section) and add the terminal application you're using.
 
 ## License
 
