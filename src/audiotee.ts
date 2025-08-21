@@ -48,8 +48,9 @@ export class AudioTee {
       args.push('--sample-rate', this.options.sampleRate.toString())
     }
 
-    if (this.options.chunkDuration !== undefined) {
-      args.push('--chunk-duration', this.options.chunkDuration.toString())
+    if (this.options.chunkDurationMs !== undefined) {
+      // the underlying audiotee binary still expects the chunk duration in seconds
+      args.push('--chunk-duration', (this.options.chunkDurationMs / 1000).toString())
     }
 
     if (this.options.mute) {

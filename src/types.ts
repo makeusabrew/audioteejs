@@ -1,6 +1,6 @@
 export interface AudioTeeOptions {
   sampleRate?: number
-  chunkDuration?: number
+  chunkDurationMs?: number
   mute?: boolean
   includeProcesses?: number[]
   excludeProcesses?: number[]

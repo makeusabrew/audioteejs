@@ -37,7 +37,7 @@ The `AudioTee` constructor accepts an optional options object:
 ```ts
 interface AudioTeeOptions {
   sampleRate?: number // Target sample rate (Hz), default: device default
-  chunkDuration?: number // Duration of each audio chunk in seconds, default: 0.2
+  chunkDurationMs?: number // Duration of each audio chunk in milliseconds, defaults to 200
   mute?: boolean // Mute system audio whilst capturing, default: false
   includeProcesses?: number[] // Only capture audio from these process IDs
   excludeProcesses?: number[] // Exclude audio from these process IDs

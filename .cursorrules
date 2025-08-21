@@ -172,7 +172,7 @@ import { AudioTee } from 'audiotee'
 
 const audiotee = new AudioTee({
   sampleRate: 16000,
-  chunkDuration: 0.1,
+  chunkDurationMs: 100,
   mute: true,
 })
 
