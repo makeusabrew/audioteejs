@@ -1,10 +1,10 @@
 # AudioTee.js
 
-AudioTee.js captures your Mac's system audio output and emits it as PCM encoded chunks at regular intervals. It's a tiny Node.js wrapper around the underlying [AudioTee](https://github.com/makeusabrew/audiotee) swift binary, which is [bundled](./bin) in this repository and distributed with the package published to [npm](https://www.npmjs.com/package/audiotee).
+AudioTee.js captures your Mac's system audio output - whatever's playing through your speakers or headphones - and emits it as PCM encoded chunks at regular intervals. It's a tiny Node.js wrapper around the underlying [AudioTee](https://github.com/makeusabrew/audiotee) swift binary, which is [bundled](./bin) in this repository and distributed with the package published to [npm](https://www.npmjs.com/package/audiotee).
 
 ## About
 
-[AudioTee](https://github.com/makeusabrew/audiotee) is a standalone swift binary which uses the [Core Audio taps](https://developer.apple.com/documentation/coreaudio/capturing-system-audio-with-core-audio-taps) API introduced in macOS 14.2 to 'tap' whatever's playing through your speakers and emit it to `stdout`. AudioTee.js spawns that binary as a child process and forwards stdout as `data` events.
+[AudioTee](https://github.com/makeusabrew/audiotee) is a standalone swift binary which uses the [Core Audio taps](https://developer.apple.com/documentation/coreaudio/capturing-system-audio-with-core-audio-taps) API introduced in macOS 14.2 to 'tap' whatever's playing through your speakers and write it to `stdout`. AudioTee.js spawns that binary as a child process and relays stdout as `data` events.
 
 ## Basic usage
 
