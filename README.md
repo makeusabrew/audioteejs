@@ -69,21 +69,22 @@ audiotee.on('error', (error: Error) => {
 })
 
 // Logging
-audiotee.on('log', (message: string, level: LogLevel) => {
+audiotee.on('log', (level: LogLevel, message: MessageData) => {
   // System logs from the AudioTee binary
-  // LogLevel: 'metadata' | 'stream_start' | 'stream_stop' | 'info' | 'error' | 'debug'
+  // LogLevel: 'info' | 'debug'
+  // MessageData includes message string and optional context object
 })
 ```
 
 ### Event details
 
-Note: a bug in versions up to and including 0.0.2 means only the `data` lifecycle event is actually currently emitted.
-
 - **`data`**: Emitted for each audio chunk. The `data` property contains raw PCM audio bytes
 - **`start`**: Emitted when audio capture begins successfully
 - **`stop`**: Emitted when audio capture ends
 - **`error`**: Emitted for process errors, permission failures, or system issues
-- **`log`**: Emitted for all system messages from the underlying AudioTee binary
+- **`log`**: Emitted for debug and info messages from the underlying AudioTee binary
+
+**Note:** Versions prior to 0.0.5 only emit the `data` event. All other events (`start`, `stop`, `error`, `log`) were fixed in version 0.0.5.
 
 ## Requirements
 
@@ -97,7 +98,7 @@ During the `0.x.x` release, the API is unstable and subject to change without no
 
 - Always specify a sample rate. Tell AudioTee what you want, rather than having to parse the
   `metadata` message to see what you got from the output device
-- Specifying _any_ sample rate automatically switches encoding to use 16-bit signed integers, which is half the byte size and bandwidth compared to the 32-bit float the stream probably uses natively
+- Specifying _any_ sample rate automatically switches encoding to use 16-bit signed integers, which is half the byte size and bandwidth compared to the 32-bit float the source stream was probably using
 - You'll probably need to specify a different `chunkDuration` depending on your use case. For example, some ASRs are quite particular about the exact length of each chunk they expect to process.
 
 ## Permissions
@@ -105,6 +106,26 @@ During the `0.x.x` release, the API is unstable and subject to change without no
 There is no provision in the underlying AudioTee library to pre-emptively check the state of the required `NSAudioCaptureUsageDescription` permission. You _should_ be prompted to grant it the first time AudioTee.js tries to record anything, but at least some popular terminal emulators like iTerm and those built in to VSCode/Cursor don't. They will instead happily start recording total silence.
 
 You can work around this either by using the built in macOS terminal emulator, or by granting system audio recording permission manually. Open Settings > Privacy & Security > Screen & System Audio Recording and scroll down to the **System Audio Recording Only** section (**not** the top 'Screen & System Audio Recording' section) and add the terminal application you're using.
+
+## Code signing
+
+The AudioTee binary included in this package is ad-hoc signed (unsigned with a developer certificate). This is fine for most use cases because:
+
+### For Electron applications
+
+When the AudioTee binary is bundled inside an Electron app, it **inherits the code signature** from the parent application. You don't need to sign it separately:
+
+1. **Automatic inclusion**: The binary at `node_modules/audiotee/bin/audiotee` gets bundled with your app
+2. **Parent signature inheritance**: When you sign your Electron app (with properly configured `electron-builder` or `electron-forge`), all binaries within the app bundle automatically inherit that signature
+3. **Entitlements**: Ensure your app's entitlements are correct.
+
+### For standalone usage
+
+If you're running AudioTee.js outside of a signed parent application (e.g., directly via Node.js in Terminal):
+
+- **Development**: The ad-hoc signed binary works fine
+- **First run**: macOS may show a Gatekeeper warning that can be bypassed via System Settings
+- **Production**: Consider signing the binary with your Developer ID if distributing as a standalone tool
 
 ## License
 
