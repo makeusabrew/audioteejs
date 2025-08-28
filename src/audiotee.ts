@@ -75,9 +75,13 @@ export class AudioTee {
     for (const line of lines) {
       try {
         const logMessage: LogMessage = JSON.parse(line)
-        this.emit('log', logMessage.data.message, logMessage.message_type)
 
-        // TODO: support metadata, too
+        // Only emit log events for debug and info types
+        if (logMessage.message_type === 'debug' || logMessage.message_type === 'info') {
+          this.emit('log', logMessage.message_type, logMessage.data)
+        }
+
+        // Handle specific message types
         if (logMessage.message_type === 'stream_start') {
           this.emit('start')
         } else if (logMessage.message_type === 'stream_stop') {
@@ -86,6 +90,7 @@ export class AudioTee {
           this.emit('error', new Error(logMessage.data.message))
         }
       } catch (parseError) {
+        console.error('Error parsing log message:', parseError)
         // TODO: handle this
       }
     }

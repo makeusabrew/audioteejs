@@ -10,14 +10,19 @@ export interface AudioChunk {
   data: Buffer
 }
 
-export type LogLevel = 'metadata' | 'stream_start' | 'stream_stop' | 'info' | 'error' | 'debug'
+export type MessageType = 'metadata' | 'stream_start' | 'stream_stop' | 'info' | 'error' | 'debug'
+
+export type LogLevel = 'info' | 'debug'
+
+export interface MessageData {
+  message: string
+  context?: Record<string, string | number | boolean | object>
+}
 
 export interface LogMessage {
-  timestamp: Date
-  message_type: LogLevel
-  data: {
-    message: string
-  }
+  timestamp: string
+  message_type: MessageType
+  data: MessageData
 }
 
 export interface AudioTeeEvents {
@@ -25,5 +30,5 @@ export interface AudioTeeEvents {
   start: () => void
   stop: () => void
   error: (error: Error) => void
-  log: (message: string, level: LogLevel) => void
+  log: (level: LogLevel, message: MessageData) => void
 }

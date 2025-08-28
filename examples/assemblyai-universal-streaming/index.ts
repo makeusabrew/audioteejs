@@ -1,4 +1,4 @@
-import { AudioChunk, AudioTee } from '../../dist/index.js'
+import { AudioChunk, AudioTee, LogLevel, MessageData } from '../../dist/index.js'
 import { AssemblyAI, TurnEvent } from 'assemblyai'
 
 // Replace with your actual AssemblyAI API key
@@ -30,7 +30,7 @@ async function run() {
   // Initialize AudioTee with matching sample rate and optimized chunk duration
   const audioTee = new AudioTee({
     sampleRate: SAMPLE_RATE, // Match AssemblyAI's expected sample rate
-    chunkDuration: 0.05, // 50ms chunks as recommended by AssemblyAI
+    chunkDurationMs: 50, // 50ms chunks as recommended by AssemblyAI
   })
 
   // Set up AssemblyAI transcriber event handlers
@@ -63,15 +63,25 @@ async function run() {
     }
   })
 
+  audioTee.on('start', () => {
+    console.log('AudioTee: Audio capture started')
+  })
+
+  audioTee.on('stop', () => {
+    console.log('AudioTee: Audio capture stopped')
+  })
+
   audioTee.on('error', (error: Error) => {
     console.error('AudioTee Error:', error)
   })
 
-  audioTee.on('log', (message: string, level: string) => {
-    if (level === 'error') {
-      console.error(`AudioTee [${level}]: ${message}`)
+  audioTee.on('log', (level: LogLevel, message: MessageData) => {
+    // Log different levels with appropriate formatting
+    if (level === 'debug') {
+      console.debug(`AudioTee [DEBUG]: ${message.message}`)
+    } else if (level === 'info') {
+      console.info(`AudioTee [INFO]: ${message.message}`)
     }
-    // Suppress other log levels to keep output clean
   })
 
   // Pipe AudioTee data to AssemblyAI
