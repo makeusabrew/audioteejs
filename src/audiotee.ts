@@ -103,6 +103,12 @@ export class AudioTee {
         return
       }
 
+      // Check platform at runtime
+      if (process.platform !== 'darwin') {
+        reject(new Error(`AudioTee currently only supports macOS (darwin). Current platform: ${process.platform}`))
+        return
+      }
+
       const binaryPath = join(__dirname, '..', 'bin', 'audiotee')
       const args = this.buildArguments()
 
